@@ -43,21 +43,8 @@ export const translate = (term:string, terms) => {
  * @param iconsConfig
  * @param sunState
  */
-export const getWeatherIcon = (condition: string, iconsConfig: IconsConfig, sunState: string) => {
-  let isNight:boolean = sunState && sunState == "below_horizon" ;
-  let iconName = isNight ? iconsConfig.iconsNight[condition] : iconsConfig.iconsDay[condition] ;
-
-  if (iconsConfig.path == null) {
-    console.info("Image path not found. (hacsImagePathExist=" + hacsImagePathExist
-                  + ")(manImagePathExist=" + manImagePathExist) ;
-  }
-
-  if(undefined === iconName)
-    console.info( "Icons issue. States: icons_model=" + iconsConfig.icons_model
-      + " - isDay=" + (!isNight) + " - condition: " + condition + ".") ;
-
-  //console.info(this._config.weather.icons_model + ' - ' + condition + ' - ' + this._weatherIconsDay[condition]) ;
-  return `${iconsConfig.path}/${iconsConfig.iconType}/${iconName}.svg` ;
+export const getWeatherIcon = (condition: string, iconsConfig: IconsConfig, _sunState: string) => {
+  return `${iconsConfig.path}/meteo.lt/${condition}.svg` ;
 } ;
 
 /**

@@ -107,6 +107,7 @@ export interface Forecast {
   icons?: Days ;
   precipitation_probability?: Days ;
   precipitation_intensity?: Days ;
+  condition?: Days;
 }
 
 export interface Days {

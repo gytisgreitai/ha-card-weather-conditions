@@ -21,13 +21,13 @@ const _renderForecast = (entity_low: number, entity_unit_low: string,
     return html`
             <div class="highTemp">
               <b>${entity_high}</b> ${entity_unit_high}
-            </div>   
+            </div>
       `;
   } else if (undefined == entity_high) {
     return html`
             <div class="lowTemp">
               ${entity_low} ${entity_unit_low}
-            </div>  
+            </div>
       `;
   } else {
     return html`
@@ -55,6 +55,8 @@ export const renderForecasts = (hass: HomeAssistant, currentCfg: Current, foreca
     ? Object.entries(forecastCfg.precipitation_probability) : undefined;
   let precipitation_intensity: [string, number][] = forecastCfg.precipitation_intensity
     ? Object.entries(forecastCfg.precipitation_intensity) : undefined;
+  let conditions = forecastCfg.condition
+    ? Object.entries(forecastCfg.condition) : undefined;
 
   let maxDays = Math.max(icons ? icons.length : 0,
     temperature_high ? temperature_high.length : 0, temperature_low ? temperature_low.length : 0,
@@ -69,10 +71,10 @@ export const renderForecasts = (hass: HomeAssistant, currentCfg: Current, foreca
   return maxDays > 1 ? html`
       <div class="forecast clear ${border ? "spacer" : ""}">
         ${days.map(day => {
-    let icon: string, day_temp_low: number, day_temp_high: number, day_prec_probab: number, day_prec_intensity: number;
+    let icon: string, day_temp_low: number, day_temp_high: number, day_prec_probab: number, day_prec_intensity: number, condition: string;
     let date = new Date(forecastDate.setDate(forecastDate.getDate() + 1))
       .toLocaleDateString(lang, {weekday: "short"});
-    
+
     if( icons && icons[day] && hass.states[icons[day][1]] )
       icon = hass.states[icons[day][1]].state.toLowerCase() ;
 
@@ -80,22 +82,24 @@ export const renderForecasts = (hass: HomeAssistant, currentCfg: Current, foreca
       day_temp_low = numFormat(hass.states[temperature_low[day][1]].state, 0) ;
     if( temperature_high && temperature_high[day] && hass.states[temperature_high[day][1]] )
       day_temp_high = numFormat(hass.states[temperature_high[day][1]].state, 0) ;
-    
+
     if( precipitation_probability && precipitation_probability[day] && hass.states[precipitation_probability[day][1]] )
      day_prec_probab = numFormat(hass.states[precipitation_probability[day][1]].state, 0) ;
     if( precipitation_intensity && precipitation_intensity[day] && hass.states[precipitation_intensity[day][1]] )
       day_prec_intensity = numFormat(hass.states[precipitation_intensity[day][1]].state, 0) ;
-    
+
+    if (conditions && conditions[day] && hass.states[conditions[day][1]])
+        condition = hass.states[conditions[day][1]].state;
+
     return html`
           <div class="day ${day}">
               <div class="dayname">${date}</div>
               ${icon ? html`
-              <i class="icon" style="background: none, url('${getWeatherIcon(icon, iconsConfig, sun)}') no-repeat; 
-                    background-size: contain"></i>                
+              <i class="icon" style="background: none, url('${getWeatherIcon(icon, iconsConfig, sun)}') no-repeat;
+                    background-size: contain"></i>
               ` : ""}
-              ${_renderForecast(day_temp_low, '', day_temp_high, getUnit(hass,"temperature"))} 
-              ${_renderForecast(day_prec_probab, '%', day_prec_intensity, 
-              getUnit(hass,"precipitation") + '/h')}                       
+              ${_renderForecast(day_temp_low, '', day_temp_high, getUnit(hass,"temperature"))}
+              <div style="font-size:12px;line-height:0.8">${condition}</div>
           </div>
           `;
   })}
